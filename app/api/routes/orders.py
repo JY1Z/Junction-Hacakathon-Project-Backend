@@ -91,9 +91,17 @@ async def customer_decision(
         "reject": "rejected"
     }
 
+    if payload.action == "confirm":
+        message = f"Customer confirmed replacements for order {order_id}."
+    else:
+        message = (
+            f"Customer rejected the replacements for order {order_id}. "
+        )
+
     return OrderDecisionResponse(
         order_id=order_id,
         action=payload.action,
         decisions=payload.decisions,
-        status=status_map.get(payload.action, "unknown")
+        status=status_map.get(payload.action, "unknown"),
+        message_to_delivery = message
     )

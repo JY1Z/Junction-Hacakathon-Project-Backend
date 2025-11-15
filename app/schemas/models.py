@@ -130,12 +130,7 @@ class OrderDecisionResponse(BaseModel):
     action: str
     decisions: List[ReplacementDecision]
     status: str
-
-
-class MissingItemRecommendation(BaseModel):
-    original_product_id: int
-    recommended_ids: List[int]
-    reason: str
+    message_to_delivery: str
 
 
 
