@@ -1,9 +1,13 @@
 # app/schemas/models.py
 
-# app/schemas/models.py
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel, validator
 import json
+
+
+
+
+
 
 
 # -------- Customer --------
@@ -57,8 +61,7 @@ class OrderBase(BaseModel):
     items: List[OrderItem]
 
 
-class OrderCreate(OrderBase):
-    pass
+
 
 
 class OrderRead(BaseModel):
@@ -101,8 +104,48 @@ class MissingItemRecommendation(BaseModel):
     original_product_id: int
     recommended_ids: List[int]
     reason: str
+    replacement_message: str = ""
 
 
 class OrderAnalysisResponse(BaseModel):
     order_id: int
     recommendations: List[MissingItemRecommendation]
+
+
+# V1
+
+
+class ReplacementDecision(BaseModel):
+    original_product_id: int
+    chosen_product_id: Optional[int]
+
+
+class OrderDecisionRequest(BaseModel):
+    action: Literal["confirm", "reject"]
+    decisions: List[ReplacementDecision]
+
+
+class OrderDecisionResponse(BaseModel):
+    order_id: int
+    action: str
+    decisions: List[ReplacementDecision]
+    status: str
+
+
+class MissingItemRecommendation(BaseModel):
+    original_product_id: int
+    recommended_ids: List[int]
+    reason: str
+
+
+
+class OrderAnalysisResponse(BaseModel):
+    order_id: int
+    recommendations: List[MissingItemRecommendation]
+
+class OrderBase(BaseModel):
+    customer_id: int
+    items: List[OrderItem]
+
+class OrderCreate(OrderBase):
+    pass
