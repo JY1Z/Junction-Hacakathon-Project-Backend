@@ -4,6 +4,8 @@ from app.schemas.models import (
     OrderCreate,
     OrderAnalysisResponse,
     MissingItemRecommendation,
+    OrderDecisionRequest,
+    OrderDecisionResponse,
 )
 from app.services.gemini import get_recommendations_for_order
 
@@ -16,16 +18,8 @@ router = APIRouter(tags=["orders"])
     summary="Create delivery order and get AI recommendations",
 )
 async def create_delivery_order(order: OrderCreate) -> OrderAnalysisResponse:
-    # fake_order = {
-    #     "order_id": 1,
-    #     "customer_id": 101,
-    #     "items": [
-    #         {"id": 1, "name": "Whole Milk", "quantity": 1, "status": "unavailable", "price": 3.5},
-    #         {"id": 2, "name": "Eggs 12-pack", "quantity": 1, "status": "unavailable", "price": 2.9},
-    #         {"id": 3, "name": "Low-Fat Milk", "quantity": 1, "status": "available", "price": 3.0},
-    #     ]
-    # }
 
+    # mock data
     fake_customer = {
         "id": 101,
         "name": "Italian restaurant kitchen",
@@ -68,13 +62,8 @@ async def create_delivery_order(order: OrderCreate) -> OrderAnalysisResponse:
     return OrderAnalysisResponse(
         order_id=order_dict["order_id"],
         recommendations=recommendations,
-)
+    )
 
-
-from app.schemas.models import (
-    OrderDecisionRequest,
-    OrderDecisionResponse,
-)
 
 @router.post(
     "/customer/order/{order_id}/decision",
@@ -102,6 +91,6 @@ async def customer_decision(
         order_id=order_id,
         action=payload.action,
         decisions=payload.decisions,
-        status=status_map.get(payload.action, "unknown"),
-        message_to_delivery = message
+        status=status_map[payload.action],
+        message_to_delivery=message
     )
