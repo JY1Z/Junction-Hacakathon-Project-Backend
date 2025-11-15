@@ -1,13 +1,7 @@
 # app/schemas/models.py
-
+# V1
 from typing import List, Optional, Literal
-from pydantic import BaseModel, validator
-import json
-
-
-
-
-
+from pydantic import BaseModel
 
 
 # -------- Customer --------
@@ -17,34 +11,12 @@ class CustomerBase(BaseModel):
     behavior: Optional[str] = None
 
 
-class CustomerCreate(CustomerBase):
-    pass
-
-
-class CustomerRead(CustomerBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
 # -------- Product --------
 class ProductBase(BaseModel):
     name: str
     category: str
     price: Optional[float] = None
     quantity: int
-
-
-class ProductCreate(ProductBase):
-    pass
-
-
-class ProductRead(ProductBase):
-    id: int
-
-    class Config:
-        orm_mode = True
 
 
 # -------- Order --------
@@ -61,26 +33,8 @@ class OrderBase(BaseModel):
     items: List[OrderItem]
 
 
-
-
-
-class OrderRead(BaseModel):
-    id: int
-    customer_id: int
-    items: List[OrderItem]
-    status: str
-
-    class Config:
-        orm_mode = True
-
-    @validator("items", pre=True)
-    def parse_items(cls, v):
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except Exception:
-                return []
-        return v
+class OrderCreate(OrderBase):
+    pass
 
 
 # -------- Message --------
@@ -112,9 +66,7 @@ class OrderAnalysisResponse(BaseModel):
     recommendations: List[MissingItemRecommendation]
 
 
-# V1
-
-
+# -------- Customer decision --------
 class ReplacementDecision(BaseModel):
     original_product_id: int
     chosen_product_id: Optional[int]
@@ -132,15 +84,3 @@ class OrderDecisionResponse(BaseModel):
     status: str
     message_to_delivery: str
 
-
-
-class OrderAnalysisResponse(BaseModel):
-    order_id: int
-    recommendations: List[MissingItemRecommendation]
-
-class OrderBase(BaseModel):
-    customer_id: int
-    items: List[OrderItem]
-
-class OrderCreate(OrderBase):
-    pass
