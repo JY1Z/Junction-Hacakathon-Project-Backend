@@ -44,7 +44,7 @@ class Product(Base):
     name = Column(String, nullable=False)
     category = Column(String, index=True, nullable=False)
     price = Column(Float, nullable=True)
-    in_stock = Column(Boolean, default=True)
+    quantity = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 

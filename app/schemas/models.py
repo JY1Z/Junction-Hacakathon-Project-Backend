@@ -29,7 +29,7 @@ class ProductBase(BaseModel):
     name: str
     category: str
     price: Optional[float] = None
-    in_stock: bool = True
+    quantity: int
 
 
 class ProductCreate(ProductBase):
