@@ -1,9 +1,12 @@
 # app/services/gemini.py
 import json
+import logging
 from google import genai
 from app.core.config import settings
 
+logger = logging.getLogger(__name__)
 
+# fake data for V1 demo
 fake_order = {
     "order_id": 1,
     "customer_id": 101,
@@ -30,8 +33,13 @@ fake_products = [
     {"id": 6, "name": "Free-range Eggs 12-pack", "category": "Eggs",  "price": 3.5, "quantity": 6},
 ]
 
+_client = None
+def get_client():
+    global _client
+    if _client is None:
+        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    return _client
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 missing_items = [
     item for item in fake_order["items"]
@@ -78,6 +86,8 @@ Return ONLY a JSON object in this exact format:
 
 
 def call_gemini(prompt: str) -> dict:
+    client = get_client()
+
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
@@ -102,36 +112,43 @@ def call_gemini(prompt: str) -> dict:
     data.setdefault("replacement_message", "")
     return data
 
-
-all_recommendations: list[dict] = []
-
-for missing_item in missing_items:
-    missing_product = next(p for p in fake_products if p["id"] == missing_item["id"])
-
-    candidates = [
-        p for p in fake_products
-        if p["category"] == missing_product["category"]
-        and p["quantity"] > 0
-        and p["quantity"] >= missing_item["quantity"]
-        and p["id"] != missing_product["id"]
+def get_recommendations_for_order(order, customer, products):
+    missing_items = [
+        i for i in order["items"]
+        if i["status"] == "unavailable"
     ]
 
-    if not candidates:
-        all_recommendations.append({
+    results = []
+
+    for missing in missing_items:
+        missing_product = next(
+            p for p in products if p["id"] == missing["id"]
+        )
+
+        candidates = [
+            p for p in products
+            if p["category"] == missing_product["category"]
+            and p["quantity"] >= missing["quantity"]
+            and p["quantity"] > 0
+            and p["id"] != missing_product["id"]
+        ]
+
+        if not candidates:
+            results.append({
+                "original_product_id": missing_product["id"],
+                "recommended_ids": [],
+                "reason": "No valid replacements in category",
+            })
+            continue
+
+        prompt = build_prompt(customer, missing_product, candidates)
+        llm_result = call_gemini(prompt)
+
+        results.append({
             "original_product_id": missing_product["id"],
-            "recommended_ids": [],
-            "reason": "No available candidates in same category",
+            "recommended_ids": llm_result["recommended_ids"],
+            "reason": llm_result["reason"],
+            "replacement_message": llm_result["replacement_message"],
         })
-        continue
 
-    prompt = build_prompt(fake_customer, missing_product, candidates)
-    result = call_gemini(prompt)
-
-    all_recommendations.append({
-        "original_product_id": missing_product["id"],
-        "recommended_ids": result["recommended_ids"],
-        "reason": result["reason"],
-        "replacement_message": result["replacement_message"],
-    })
-
-print(json.dumps(all_recommendations, indent=2, ensure_ascii=False))
+    return results
