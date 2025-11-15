@@ -64,6 +64,9 @@ Your task:
 - Explain briefly why these replacements are suitable for a professional kitchen.
 - Mention the missing ingredient and what you are replacing it with.
 
+You MUST respond ONLY with JSON.
+No explanation. No markdown. No extra text.
+
 Return ONLY a JSON object in this exact format:
 
 {{
