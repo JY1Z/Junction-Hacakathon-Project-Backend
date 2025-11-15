@@ -30,6 +30,5 @@ jobs:
           DATABASE_URL: "sqlite:///./tests/test.db"
           GEMINI_API_KEY: fake-key-for-tests
         run: |
-          pytest --maxfail=1
-          --cov=app \
+          pytest --maxfail=1 --cov=app 
 
