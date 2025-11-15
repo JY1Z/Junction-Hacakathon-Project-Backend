@@ -16,5 +16,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(health_router, prefix="/health", tags=["health"])
-app.include_router(db_test_router, prefix="/db", tags=["db"])
+app.include_router(health_router, prefix="/health", tags=["health"], include_in_schema=False)
+app.include_router(db_test_router, prefix="/db", tags=["db"], include_in_schema=False)
