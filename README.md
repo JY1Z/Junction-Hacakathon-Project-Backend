@@ -1,4 +1,4 @@
-# AI-Powered Logistics Sulotion
+# AI-Powered Logistics Solution
 [![CI - PR to Main](https://github.com/JY1Z/Junction-Hacakathon-Project-Backend/actions/workflows/ci-main.yml/badge.svg)](https://github.com/JY1Z/Junction-Hacakathon-Project-Backend/actions/workflows/ci-main.yml)
 [![CD - Deploy to Render](https://github.com/JY1Z/Junction-Hacakathon-Project-Backend/actions/workflows/cd-main.yml/badge.svg)](https://github.com/JY1Z/Junction-Hacakathon-Project-Backend/actions/workflows/cd-main.yml)
   
